@@ -2,9 +2,9 @@ scalar Date
 scalar Long
 
 type Query {
-    book(id: Long): BookResponse
+    book(id: Long!): BookResponse
     books: [BookResponse]
-    author(id: Long): AuthorResponse
+    author(id: Long!): AuthorResponse
     authors: [AuthorResponse]
 }
 

@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 data class Book(
     val id: Long,
-    val name: String,
+    var name: String,
     val date: LocalDate,
     val review: String,
     val authorId: Long

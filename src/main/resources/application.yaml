@@ -1,0 +1,20 @@
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.graphql.autoconfigure.servlet.GraphQlWebMvcAutoConfiguration
+  graphql:
+    graphiql:
+      enabled: true
+    schema:
+      # Set loading to something that does not exist to ensure that no default schema is loaded
+      locations: classpath:graphql/shared/**/
+    multi-endpoints:
+      - name: internal-schema
+        path: "/internal-graphql"
+        locations: classpath:graphql/internal/**/
+        consider-shared-controllers: true
+      - name: external-schema
+        path: "/external-graphql"
+        locations: classpath:graphql/external/**/
+        consider-shared-controllers: true
+
+
