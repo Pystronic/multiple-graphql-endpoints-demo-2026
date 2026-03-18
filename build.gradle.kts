@@ -1,15 +1,16 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.springframework.boot") version "3.0.5"
-    id("io.spring.dependency-management") version "1.1.0"
-    kotlin("jvm") version "1.7.22"
-    kotlin("plugin.spring") version "1.7.22"
+    id("org.springframework.boot") version "4.0.3"
+    id("io.spring.dependency-management") version "1.1.7"
+    kotlin("jvm") version "2.3.10"
+    kotlin("plugin.spring") version "2.3.10"
 }
 
 group = "com.example"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_21
 
 repositories {
     mavenCentral()
@@ -26,12 +27,18 @@ dependencies {
     testImplementation("org.springframework.graphql:spring-graphql-test")
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
+configure<KotlinBaseExtension> {
+    jvmToolchain {
+        this.languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
+
+tasks.withType<KotlinCompile> {
+    compilerOptions {
+        freeCompilerArgs = listOf("-Xjsr305=strict")
+    }
+}
+
 
 tasks.withType<Test> {
     useJUnitPlatform()
