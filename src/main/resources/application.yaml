@@ -8,11 +8,11 @@ spring:
       # Set loading to something that does not exist to ensure that no default schema is loaded
       locations: classpath:graphql/shared/**/
     multi-endpoints:
-      - name: internal-schema
+      - name: internalSchema
         path: "/internal-graphql"
         locations: classpath:graphql/internal/**/
         consider-shared-controllers: true
-      - name: external-schema
+      - name: externalSchema
         path: "/external-graphql"
         locations: classpath:graphql/external/**/
         consider-shared-controllers: true

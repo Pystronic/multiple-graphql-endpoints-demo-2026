@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
 import org.springframework.core.io.Resource
 import org.springframework.core.io.support.ResourcePatternResolver
-import org.springframework.graphql.ExecutionGraphQlService
 import org.springframework.graphql.data.GraphQlArgumentBinder
 import org.springframework.graphql.data.method.HandlerMethodArgumentResolver
 import org.springframework.graphql.data.method.annotation.support.AnnotatedControllerConfigurer
@@ -81,16 +80,26 @@ class GraphQlMultiEndpointRegistrar(
             val executionService = DefaultExecutionGraphQlService(graphQlSource)
             executionService.addDataLoaderRegistrar(batchLoaderRegistry)
 
+            val webGraphqlHandler = WebGraphQlHandler
+                .builder(executionService)
+                .interceptors(interceptors.orderedStream().toList())
+                .build()
+
             val routerFunctions = createRouterFunction(
                 endpointProperties,
                 graphqlProperties,
-                executionService,
+                webGraphqlHandler,
                 graphQlSource
             )
 
             beanFactory.registerSingleton("${endpointProperties.name}GraphqlSource", graphQlSource)
             beanFactory.registerSingleton("${endpointProperties.name}ExecutionGraphQlService", executionService)
-            beanFactory.registerSingleton("${endpointProperties.name}GraphQLRouterFunction", routerFunctions)
+            beanFactory.registerSingleton("${endpointProperties.name}WebGraphQlHandler", webGraphqlHandler)
+            beanFactory.registerSingleton("${endpointProperties.name}GraphQlRouterFunction", routerFunctions)
+
+            beanFactory.registerDependentBean("${endpointProperties.name}GraphqlSource", "${endpointProperties.name}ExecutionGraphQlService")
+            beanFactory.registerDependentBean("${endpointProperties.name}ExecutionGraphQlService", "${endpointProperties.name}WebGraphQlHandler")
+            beanFactory.registerDependentBean("${endpointProperties.name}WebGraphQlHandler", "${endpointProperties.name}GraphQlRouterFunction")
         }
 
         if (!graphqlProperties.schema.introspection.isEnabled) {
@@ -124,7 +133,7 @@ class GraphQlMultiEndpointRegistrar(
         controllerConfigurer.setControllerPredicate { clazz ->
             clazz.annotations.any {
                 (it is EndpointController && it.value == endpointProperties.name) ||
-                        (endpointProperties.considerSharedControllers && it is Controller)
+                        (it is Controller && endpointProperties.considerSharedControllers)
             }
         }
 
@@ -162,12 +171,9 @@ class GraphQlMultiEndpointRegistrar(
     private fun createRouterFunction(
         schemaEndpointEntry: GraphQlMultiEndpointProperties.GraphQlMultiSchemaEntry,
         properties: GraphQlProperties,
-        executionGraphqlService: ExecutionGraphQlService,
+        webGraphqlHandler: WebGraphQlHandler,
         graphQlSource: GraphQlSource
     ): RouterFunction<ServerResponse> {
-        val webGraphqlHandler =
-            WebGraphQlHandler.builder(executionGraphqlService).interceptors(interceptors.orderedStream().toList())
-                .build()
         val graphqlHttpHandler = GraphQlHttpHandler(webGraphqlHandler)
 
         return RouterFunctions.route()
