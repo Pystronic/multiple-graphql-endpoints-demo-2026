@@ -4,7 +4,7 @@ import com.example.multiplegraphqlendpointsdemo.config.multiEndpoint.EndpointCon
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.QueryMapping
 
-@EndpointController("external-schema")
+@EndpointController("externalSchema")
 class ExternalBookController {
 
     @QueryMapping
@@ -14,6 +14,8 @@ class ExternalBookController {
 
     @QueryMapping
     fun books(): List<Book> {
-        return BookDataSource.books.map { it.apply { name = "EXTERNAL BOOK" } }
+        return BookDataSource.books.map {
+            Book(id = it.id, name = "EXTERNAL BOOK", date = it.date, review = it.review, authorId = it.authorId)
+        }
     }
 }

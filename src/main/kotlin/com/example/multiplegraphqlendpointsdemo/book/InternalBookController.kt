@@ -4,7 +4,7 @@ import com.example.multiplegraphqlendpointsdemo.config.multiEndpoint.EndpointCon
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.QueryMapping
 
-@EndpointController("internal-schema")
+@EndpointController("internalSchema")
 class InternalBookController {
 
     @QueryMapping
