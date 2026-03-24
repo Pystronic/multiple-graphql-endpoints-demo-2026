@@ -4,6 +4,7 @@ import graphql.execution.instrumentation.Instrumentation
 import graphql.introspection.Introspection
 import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.ObjectProvider
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.config.ConfigurableBeanFactory
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.convert.ApplicationConversionService
@@ -41,7 +42,8 @@ class GraphQlMultiEndpointRegistrar(
     private val multiEndpointProperties: GraphQlMultiEndpointProperties,
     private val applicationContext: ApplicationContext,
     private val beanFactory: ConfigurableBeanFactory,
-    private val executors: ObjectProvider<Executor>,
+    @field:Qualifier("applicationTaskExecutor")
+    private val applicationTaskExecutor: Executor,
     private val resourcePatternResolver: ResourcePatternResolver,
     private val argumentResolvers: ObjectProvider<HandlerMethodArgumentResolver>,
     private val exceptionResolvers: ObjectProvider<DataFetcherExceptionResolver>,
@@ -122,7 +124,7 @@ class GraphQlMultiEndpointRegistrar(
                 )
             }
 
-            executors.ifAvailable { executor: Executor -> setExecutor(executor) }
+            setExecutor(applicationTaskExecutor)
 
             argumentResolvers.orderedStream().forEach { resolver: HandlerMethodArgumentResolver ->
                 addCustomArgumentResolver(resolver)
