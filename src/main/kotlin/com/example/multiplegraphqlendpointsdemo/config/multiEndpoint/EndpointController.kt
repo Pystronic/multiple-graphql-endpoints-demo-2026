@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component
 @Retention(AnnotationRetention.RUNTIME)
 @Component
 annotation class EndpointController(
+    // Custom attribute to not interfere with spring bean name resolution
+    val endpoint: String,
+
     @get:AliasFor(annotation = Component::class, attribute = "value")
     val value: String = "",
 )

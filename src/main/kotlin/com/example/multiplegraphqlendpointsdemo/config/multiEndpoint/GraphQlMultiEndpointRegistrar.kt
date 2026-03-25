@@ -134,7 +134,7 @@ class GraphQlMultiEndpointRegistrar(
         // Custom annotation resolution
         controllerConfigurer.setControllerPredicate { clazz ->
             clazz.annotations.any {
-                (it is EndpointController && it.value == endpointProperties.name) ||
+                (it is EndpointController && it.endpoint == endpointProperties.name) ||
                         (it is Controller && endpointProperties.considerSharedControllers)
             }
         }
